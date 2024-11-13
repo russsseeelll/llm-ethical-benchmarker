@@ -76,3 +76,5 @@ function openModal(modalId) {
 function closeModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
+
+document.getElementById('currentYear').textContent = new Date().getFullYear();
