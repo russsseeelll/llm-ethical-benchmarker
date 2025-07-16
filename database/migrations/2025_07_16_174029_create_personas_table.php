@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->text('prompt_template')->nullable();
             $table->json('metadata')->nullable();
-            $table->integer('revision')->default(1);
             $table->string('md5_hash', 32)->nullable();
             $table->timestamps();
         });

@@ -95,7 +95,7 @@ class PersonaController extends Controller
             $persona->delete();
             return redirect('/')->with('success', 'Persona deleted successfully.');
         } catch (\Exception $e) {
-            return redirect()->route('personas.index')->with('error', $e->getMessage());
+            return redirect('/')->with('error', $e->getMessage());
         }
     }
 }

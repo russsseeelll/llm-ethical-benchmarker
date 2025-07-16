@@ -56,7 +56,11 @@ class ScenarioController extends Controller
     public function show($slug)
     {
         $scenario = \App\Models\Scenario::where('slug', $slug)->with('persona')->firstOrFail();
-        return view('scenario', compact('scenario'));
+        $allPersonas = \App\Models\Persona::all();
+        $scenarios = collect([$scenario]);
+        $personas = $allPersonas;
+        $showConsentModal = false;
+        return view('scenario', compact('scenario', 'allPersonas', 'scenarios', 'personas', 'showConsentModal'));
     }
 
     /**
@@ -72,7 +76,7 @@ class ScenarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $scenario = \App\Models\Scenario::where('slug', $id)->firstOrFail();
+        $scenario = \App\Models\Scenario::where('slug', $id)->orWhere('id', $id)->firstOrFail();
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'persona_id' => 'required|exists:personas,id',
@@ -91,6 +95,11 @@ class ScenarioController extends Controller
         }
         $data['md5_hash'] = md5($data['title'] . ($data['prompt_template'] ?? ''));
         $scenario->update($data);
+        // Check if the edit was made from the scenario page or welcome page
+        $referer = $request->header('HTTP_REFERER');
+        if ($referer && str_contains($referer, '/scenario/')) {
+            return redirect()->route('scenario.show', $data['slug'])->with('success', 'Scenario updated successfully.');
+        }
         return redirect('/')->with('success', 'Scenario updated successfully.');
     }
 
@@ -99,7 +108,7 @@ class ScenarioController extends Controller
      */
     public function destroy($id)
     {
-        $scenario = \App\Models\Scenario::where('slug', $id)->firstOrFail();
+        $scenario = \App\Models\Scenario::where('slug', $id)->orWhere('id', $id)->firstOrFail();
         $scenario->delete();
         return redirect('/')->with('success', 'Scenario deleted successfully.');
     }

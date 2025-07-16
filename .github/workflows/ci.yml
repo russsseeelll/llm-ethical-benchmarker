@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Compose
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
       - name: Wait for MySQL
         run: |
           until docker exec laravel-mysql mysqladmin ping -h"localhost" --silent; do

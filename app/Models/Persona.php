@@ -14,7 +14,6 @@ class Persona extends Model
         'name',
         'prompt_template',
         'metadata',
-        'revision',
         'md5_hash',
     ];
 
