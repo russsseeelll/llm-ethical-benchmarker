@@ -29,6 +29,12 @@ class RunPromptJob implements ShouldQueue
 
     public function handle(OpenRouterProvider $provider): void
     {
+        Log::info('RunPromptJob::handle started', [
+            'test_run_id' => $this->testRun->id,
+            'model_key' => $this->modelKey,
+            'temperature' => $this->temperature,
+        ]);
+
         // Build composite prompt from scenario + persona snapshots
         $prompt = PromptBuilder::fromTestRun($this->testRun);
 
@@ -79,13 +85,11 @@ class RunPromptJob implements ShouldQueue
             scores:    $fakeScores,
         ));
 
-        // Mark test‑run completed when all 3 providers responded
-        if ($this->testRun->llmResponses()->count() === 3) {
-            $this->testRun->update([
-                'status'       => 'completed',
-                'completed_at' => now(),
-            ]);
-        }
+        // Mark test‑run completed for this individual response
+        $this->testRun->update([
+            'status'       => 'completed',
+            'completed_at' => now(),
+        ]);
     }
 
     public function tags(): array

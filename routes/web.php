@@ -31,6 +31,9 @@ Route::post('/questionnaire', [HumanResponseController::class, 'store'])->name('
 Route::post('/test-runs',            [TestRunController::class, 'store'])
 ->name('test-runs.store');
 
+Route::get('/test-runs/{testRun}/status', [TestRunController::class, 'status'])
+->name('test-runs.status');
+
 Route::post('/gdpr-consent', function (\Illuminate\Http\Request $request) {
     $request->validate(['consent' => 'accepted']);
     $request->session()->put('gdpr_consented', true);
