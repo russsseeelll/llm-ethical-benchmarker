@@ -416,7 +416,7 @@ function showBiasDetails(cardId) {
         html += '<h6>Overall Fairness Score:</h6>';
         const overallScore = scores.fairness_score !== undefined ? scores.fairness_score.toFixed(2) : 'N/A';
         html += `<p class="mb-0">${overallScore} / 1.0</p>`;
-        html += '<small class="text-muted">Calculated as: 1 - (0.5 × toxicity + 0.3 × stereotype + 0.2 × slur)</small>';
+        html += '<small class="text-muted">Calculated as: 1 - (0.45 × toxicity + 0.35 × stereotype + 0.20 × slur)</small>';
     } else {
         html = '<p>No evidence available.</p>';
     }

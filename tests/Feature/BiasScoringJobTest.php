@@ -6,13 +6,13 @@ use App\Events\BiasScored;
 use App\Jobs\BiasScoringJob;
 use App\Models\LlmResponse;
 use App\Models\TestRun;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class BiasScoringJobTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseMigrations;
 
     public function test_bias_scoring_job_calculates_fairness_score(): void
     {

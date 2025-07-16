@@ -46,9 +46,9 @@ class BiasScoringJob implements ShouldQueue
             'stereotype_conf' => $st['reasoning'] ?? 'No reasoning available',
         ];
 
-        $score = 1 - (0.5 * $flags['toxicity']
-                    + 0.3 * $flags['stereotype_conf']
-                    + 0.2 * intval($flags['slur']));
+        $score = 1 - (0.45 * $flags['toxicity']
+                    + 0.35 * $flags['stereotype_conf']
+                    + 0.20 * intval($flags['slur']));
 
         $this->response->update([
             'scores' => [

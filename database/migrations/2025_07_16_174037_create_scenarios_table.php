@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('scenarios', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('persona_id');
             $table->string('title');
+            $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->text('prompt_template')->nullable();
             $table->boolean('is_multiple_choice')->default(false);
@@ -21,6 +23,8 @@ return new class extends Migration
             $table->integer('revision')->default(1);
             $table->string('md5_hash', 32)->nullable();
             $table->timestamps();
+
+            $table->foreign('persona_id')->references('id')->on('personas')->restrictOnDelete();
         });
     }
 
