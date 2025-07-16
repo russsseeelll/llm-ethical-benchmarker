@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: laravel
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Compose
+        run: docker-compose up -d --build
+      - name: Wait for MySQL
+        run: |
+          until docker exec laravel-mysql mysqladmin ping -h"localhost" --silent; do
+            sleep 2
+          done
+      - name: Run migrations
+        run: docker exec laravel-app php artisan migrate --force
+      - name: PHP Lint
+        run: docker exec laravel-app find . -type f -name '*.php' -exec php -l {} \;
+      - name: Run PHPCS
+        run: docker exec laravel-app vendor/bin/phpcs --standard=PSR12 app/ || true
+      - name: Run PHPUnit
+        run: docker exec laravel-app php artisan test --coverage --min=70
+      - name: Security Scan
+        run: |
+          docker exec laravel-app composer require --dev enlightn/security-checker
+          docker exec laravel-app vendor/bin/security-checker security:check
+      - name: Tear down
+        run: docker-compose down 
