@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Persona;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,8 @@ class ScenarioFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence(4),
+            'slug' => $this->faker->unique()->slug(),
+            'persona_id' => Persona::factory(),
             'description' => $this->faker->paragraph(),
             'prompt_template' => $this->faker->sentence(),
             'is_multiple_choice' => $this->faker->boolean(),

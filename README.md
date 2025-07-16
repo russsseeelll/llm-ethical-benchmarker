@@ -7,6 +7,25 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+# LLM Ethical Benchmarker
+
+A Laravel application for testing and scoring LLM responses for ethical bias and fairness.
+
+## Features
+
+- Test LLM responses across multiple models (GPT-4, Claude, etc.)
+- Automated bias scoring with fairness metrics
+- Real-time UI updates with polling
+- Structured prompts with TLDR summaries
+
+## Queue Setup
+
+This application uses Redis queues for background job processing. Run the following command to process both LLM requests and bias scoring:
+
+```bash
+php artisan queue:work redis --queue=llm,scoring
+```
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

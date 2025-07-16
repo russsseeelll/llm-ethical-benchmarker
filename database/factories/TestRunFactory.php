@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\Persona;
+use App\Models\Scenario;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,8 +19,8 @@ class TestRunFactory extends Factory
     public function definition(): array
     {
         return [
-            'persona_id' => 1,
-            'scenario_id' => 1,
+            'persona_id' => Persona::factory(),
+            'scenario_id' => Scenario::factory(),
             'started_by' => $this->faker->userName(),
             'status' => 'pending',
             'started_at' => $this->faker->dateTime(),

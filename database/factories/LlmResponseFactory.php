@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\TestRun;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,15 +18,23 @@ class LlmResponseFactory extends Factory
     public function definition(): array
     {
         return [
-            'test_run_id' => 1,
+            'test_run_id' => TestRun::factory(),
             'provider' => $this->faker->company(),
             'model' => $this->faker->word(),
             'temperature' => $this->faker->randomFloat(2, 0, 1),
             'prompt' => $this->faker->sentence(),
-            'response_raw' => $this->faker->paragraph(),
+            'response_raw' => json_encode([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => $this->faker->paragraph()
+                        ]
+                    ]
+                ]
+            ]),
             'cost_usd' => $this->faker->randomFloat(4, 0, 1),
             'latency_ms' => $this->faker->numberBetween(100, 2000),
-            'scores' => json_encode(['accuracy' => $this->faker->randomFloat(2, 0, 1)]),
+            'scores' => null,
         ];
     }
 }

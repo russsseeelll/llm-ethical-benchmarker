@@ -20,7 +20,6 @@ class PersonaFactory extends Factory
             'name' => $this->faker->name(),
             'prompt_template' => $this->faker->sentence(),
             'metadata' => json_encode(['role' => $this->faker->jobTitle()]),
-            'revision' => 1,
             'md5_hash' => md5($this->faker->unique()->uuid),
         ];
     }

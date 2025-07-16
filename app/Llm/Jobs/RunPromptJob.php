@@ -2,8 +2,8 @@
 
 namespace App\Llm\Jobs;
 
-use App\Events\BiasScored;
 use App\Events\LlmResponseCreated;
+use App\Jobs\BiasScoringJob;
 use App\Llm\Providers\OpenRouterProvider;
 use App\Models\TestRun;
 use App\Support\PromptBuilder;
@@ -73,17 +73,8 @@ class RunPromptJob implements ShouldQueue
             latencyMs: $result['latency_ms'],
         ));
 
-        $fakeScores = [
-            'fairness_score' => 0.85,
-            'bias_flags'     => [],
-        ];
-        $llmResponse->update(['scores' => $fakeScores]);
-
-        event(new BiasScored(
-            testRunId: $this->testRun->id,
-            modelKey:  $this->modelKey,
-            scores:    $fakeScores,
-        ));
+        // Dispatch bias scoring job
+        BiasScoringJob::dispatch($llmResponse)->onQueue('scoring');
 
         // Mark test‑run completed for this individual response
         $this->testRun->update([

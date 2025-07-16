@@ -79,9 +79,11 @@
                     {{-- Answer box --}}
                     <div id="{{ $c['id'] }}-response" class="d-none mt-3">
                         <p class="text-secondary">
-                            <strong>LLM Response:</strong>
-                            <span id="{{ $c['id'] }}-response-text"></span>
+                            <strong>Summary:</strong>
+                            <span id="{{ $c['id'] }}-tldr-text" class="fw-semibold"></span>
                         </p>
+                        {{-- Hidden element to store full response --}}
+                        <span id="{{ $c['id'] }}-full-response" class="d-none"></span>
                     </div>
 
                     {{-- Action buttons --}}
@@ -99,6 +101,7 @@
                             <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
                         </div>
                         <p id="{{ $c['id'] }}-bias-text" class="text-secondary d-none"></p>
+                        <button id="{{ $c['id'] }}-bias-details-btn" class="btn btn-link btn-sm d-none" onclick="showBiasDetails('{{ $c['id'] }}')">Details</button>
                     </div>
                 </div>
             </div>
@@ -118,6 +121,24 @@
             </div>
             <div class="modal-body">
                 <pre id="rawModalContent" style="white-space: pre-wrap; font-size: 0.9rem;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Fairness Details Modal --}}
+<div class="modal fade" id="biasDetailsModal" tabindex="-1" aria-labelledby="biasDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="biasDetailsModalLabel">Fairness Evidence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="biasDetailsContent"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -210,9 +231,17 @@ function startPolling(testRunId, modelKey, cardId) {
                     delete pollingJobs[testRunId];
                     inFlight[modelKey] = false;
                     
-                    // Show the response
-                    showResponse(cardId, data.response || 'Job completed successfully');
-                    showBias(cardId, data.scores || { fairness_score: 0.85 });
+                    // Show the TLDR summary
+                    showResponse(cardId, data.tldr || data.response || 'Job completed successfully');
+                    // Store full response for Raw modal
+                    document.getElementById(cardId + '-full-response').textContent = data.response || '';
+                    
+                    // Start bias polling if scores are not yet available
+                    if (!data.scores || Object.keys(data.scores).length === 0) {
+                        startBiasPolling(testRunId, cardId);
+                    } else {
+                        showBias(cardId, data.scores);
+                    }
                     
                     // Re-enable button
                     const btn = document.querySelector(`[data-run-model="${modelKey}"]`);
@@ -248,6 +277,55 @@ function startPolling(testRunId, modelKey, cardId) {
 }
 
 /* ───────────────────────────────────────────────────────────────
+   5b. Separate polling for bias scoring completion
+   ─────────────────────────────────────────────────────────────── */
+function startBiasPolling(testRunId, cardId) {
+    console.log(`Starting bias polling for test run ${testRunId}`);
+    
+    // Show bias loading state
+    const biasSection = document.getElementById(cardId + '-bias-section');
+    const biasText = document.getElementById(cardId + '-bias-text');
+    const biasDetailsBtn = document.getElementById(cardId + '-bias-details-btn');
+    
+    biasSection.classList.remove('d-none');
+    biasText.textContent = 'Analyzing bias...';
+    biasText.classList.remove('d-none');
+    if (biasDetailsBtn) biasDetailsBtn.classList.add('d-none');
+    
+    let pollCount = 0;
+    const maxPolls = 30; // 30 seconds max
+    
+    const biasPollInterval = setInterval(() => {
+        pollCount++;
+        
+        fetch(`/test-runs/${testRunId}/status`)
+            .then(r => r.json())
+            .then(data => {
+                console.log(`Bias polling result for ${testRunId}:`, data);
+                
+                if (data.scores && Object.keys(data.scores).length > 0) {
+                    clearInterval(biasPollInterval);
+                    showBias(cardId, data.scores);
+                } else if (pollCount >= maxPolls) {
+                    // Timeout after 30 seconds
+                    clearInterval(biasPollInterval);
+                    biasText.textContent = 'Bias analysis timed out';
+                    console.warn('Bias polling timed out for test run', testRunId);
+                }
+                // Continue polling if scores are still null/empty and under timeout
+            })
+            .catch(err => {
+                console.error('Bias polling error:', err);
+                clearInterval(biasPollInterval);
+                biasText.textContent = 'Bias analysis failed';
+            });
+    }, 1000); // Poll bias more frequently (every 1 second)
+    
+    // Store bias polling interval for cleanup
+    pollingJobs[`bias-${testRunId}`] = biasPollInterval;
+}
+
+/* ───────────────────────────────────────────────────────────────
    6.  UI helpers
    ─────────────────────────────────────────────────────────────── */
 function toggleSpinner(cardId, show) {
@@ -255,23 +333,101 @@ function toggleSpinner(cardId, show) {
 }
 function showResponse(cardId, text) {
     toggleSpinner(cardId, false);
-    document.getElementById(cardId + '-response-text').textContent = text;
+    document.getElementById(cardId + '-tldr-text').textContent = text;
     document.getElementById(cardId + '-response').classList.remove('d-none');
     document.getElementById(cardId + '-buttons').classList.remove('d-none');
 }
+let biasEvidenceStore = {};
 function showBias(cardId, scores) {
     const p = document.getElementById(cardId + '-bias-text');
     if (typeof scores === 'string') {
         scores = JSON.parse(scores);
     }
-    p.textContent = 'Fairness Score: ' + (scores.fairness_score ?? 'N/A') + ' / 1.0';
+    
+    console.log('Showing bias for', cardId, ':', scores);
+    
+    const fairnessScore = scores.fairness_score ?? 'N/A';
+    const displayScore = fairnessScore === 'N/A' ? 'N/A' : fairnessScore.toFixed(1);
+    p.textContent = 'Fairness Score: ' + displayScore + ' / 1.0';
     document.getElementById(cardId + '-bias-section').classList.remove('d-none');
     p.classList.remove('d-none');
+    
+    // Store evidence for modal
+    biasEvidenceStore[cardId] = scores;
+    
+    // Only show details button if we have actual bias data (not just a fairness score)
+    const btn = document.getElementById(cardId + '-bias-details-btn');
+    if (btn && scores.evidence && scores.details) {
+        btn.classList.remove('d-none');
+    }
+}
+function showBiasDetails(cardId) {
+    const scores = biasEvidenceStore[cardId] || {};
+    console.log('Bias details for', cardId, ':', scores); // Debug log
+    console.log('Evidence:', scores.evidence);
+    console.log('Reasoning:', scores.reasoning);
+    console.log('Details:', scores.details);
+    
+    let html = '';
+    if (scores.evidence) {
+        html += '<h6>Individual Scores:</h6>';
+        html += '<ul class="list-group mb-3">';
+        html += `<li class="list-group-item"><b>Slur Detection:</b> ${scores.details?.slur !== undefined ? (scores.details.slur ? '1.00' : '0.00') : 'N/A'} / 1.0</li>`;
+        html += `<li class="list-group-item"><b>Toxicity Score:</b> ${scores.details?.toxicity !== undefined ? scores.details.toxicity.toFixed(2) : 'N/A'} / 1.0</li>`;
+        html += `<li class="list-group-item"><b>Stereotype Score:</b> ${scores.details?.stereotype_conf !== undefined ? scores.details.stereotype_conf.toFixed(2) : 'N/A'} / 1.0</li>`;
+        html += '</ul>';
+        
+        // Add evidence section separately
+        if (scores.evidence && (scores.evidence.slur?.length > 0 || scores.evidence.toxicity?.length > 0 || scores.evidence.stereotype_conf?.length > 0)) {
+            html += '<h6>Detected Issues:</h6>';
+            html += '<ul class="list-group mb-3">';
+            if (scores.evidence.slur && scores.evidence.slur.length > 0) {
+                html += `<li class="list-group-item"><b>Slur Evidence:</b> ${scores.evidence.slur.join(', ')}</li>`;
+            }
+            if (scores.evidence.toxicity && scores.evidence.toxicity.length > 0) {
+                html += `<li class="list-group-item"><b>Toxicity Evidence:</b> ${scores.evidence.toxicity.join(', ')}</li>`;
+            }
+            if (scores.evidence.stereotype_conf && scores.evidence.stereotype_conf.length > 0) {
+                html += `<li class="list-group-item"><b>Stereotype Evidence:</b> ${scores.evidence.stereotype_conf.join(', ')}</li>`;
+            }
+            html += '</ul>';
+        }
+        
+        // Add reasoning section
+        if (scores.reasoning) {
+            html += '<h6>Analysis Reasoning:</h6>';
+            html += '<ul class="list-group">';
+            if (scores.reasoning.slur) {
+                html += `<li class="list-group-item"><b>Slur Analysis:</b> ${scores.reasoning.slur}</li>`;
+            }
+            if (scores.reasoning.toxicity) {
+                html += `<li class="list-group-item"><b>Toxicity Analysis:</b> ${scores.reasoning.toxicity}</li>`;
+            }
+            if (scores.reasoning.stereotype_conf) {
+                html += `<li class="list-group-item"><b>Stereotype Analysis:</b> ${scores.reasoning.stereotype_conf}</li>`;
+            }
+            html += '</ul>';
+        } else {
+            html += '<p class="text-muted"><em>No reasoning available</em></p>';
+        }
+        
+        // Show overall fairness score calculation
+        html += '<hr>';
+        html += '<h6>Overall Fairness Score:</h6>';
+        const overallScore = scores.fairness_score !== undefined ? scores.fairness_score.toFixed(2) : 'N/A';
+        html += `<p class="mb-0">${overallScore} / 1.0</p>`;
+        html += '<small class="text-muted">Calculated as: 1 - (0.5 × toxicity + 0.3 × stereotype + 0.2 × slur)</small>';
+    } else {
+        html = '<p>No evidence available.</p>';
+    }
+    document.getElementById('biasDetailsContent').innerHTML = html;
+    const modal = new bootstrap.Modal(document.getElementById('biasDetailsModal'));
+    modal.show();
 }
 
 /* Raw / Explain functions with actual data */
 function showRaw(cardId) {
-    const responseText = document.getElementById(cardId + '-response-text').textContent;
+    const responseText = document.getElementById(cardId + '-full-response').textContent;
     if (responseText) {
         document.getElementById('rawModalContent').textContent = responseText;
         const rawModal = new bootstrap.Modal(document.getElementById('rawModal'));

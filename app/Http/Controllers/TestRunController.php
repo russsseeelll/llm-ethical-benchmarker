@@ -63,14 +63,28 @@ class TestRunController extends Controller
         $latestResponse = $testRun->llmResponses()->latest()->first();
         
         $response = null;
+        $tldr = null;
+        
         if ($latestResponse && $latestResponse->response_raw) {
             $rawData = json_decode($latestResponse->response_raw, true);
-            $response = $rawData['choices'][0]['message']['content'] ?? null;
+            $fullResponse = $rawData['choices'][0]['message']['content'] ?? null;
+            
+            if ($fullResponse) {
+                // Extract TLDR if present
+                if (preg_match('/TLDR:\s*(.+)$/m', $fullResponse, $matches)) {
+                    $tldr = trim($matches[1]);
+                    // Remove TLDR from full response for display
+                    $response = preg_replace('/\s*TLDR:\s*.+$/m', '', $fullResponse);
+                } else {
+                    $response = $fullResponse;
+                }
+            }
         }
         
         return response()->json([
             'status' => $testRun->status,
             'response' => $response,
+            'tldr' => $tldr,
             'scores' => $latestResponse ? $latestResponse->scores : null,
         ]);
     }
