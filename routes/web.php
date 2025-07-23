@@ -15,12 +15,12 @@ Route::get('/scenario', function () {
 
 Route::get('/scenario/{slug}', [ScenarioController::class, 'show'])->name('scenario.show');
 
-// Persona routes
+// persona routes
 Route::post('/personas', [PersonaController::class, 'store'])->name('personas.store');
 Route::put('/personas/{persona}', [PersonaController::class, 'update'])->name('personas.update');
 Route::delete('/personas/{persona}', [PersonaController::class, 'destroy'])->name('personas.destroy');
 
-// Scenario routes
+// scenario routes
 Route::post('/scenarios', [ScenarioController::class, 'store'])->name('scenarios.store');
 Route::put('/scenarios/{scenario}', [ScenarioController::class, 'update'])->name('scenarios.update');
 Route::delete('/scenarios/{scenario}', [ScenarioController::class, 'destroy'])->name('scenarios.destroy');

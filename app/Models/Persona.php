@@ -17,17 +17,19 @@ class Persona extends Model
         'md5_hash',
     ];
 
+    // get all scenarios for this persona
     public function scenarios()
     {
         return $this->hasMany(Scenario::class);
     }
 
+    // stop delete if persona has scenarios
     protected static function boot()
     {
         parent::boot();
         static::deleting(function ($persona) {
             if ($persona->scenarios()->count() > 0) {
-                throw new \Exception('Cannot delete persona with attributed scenarios.');
+                throw new \Exception('cannot delete persona with scenarios.');
             }
         });
     }

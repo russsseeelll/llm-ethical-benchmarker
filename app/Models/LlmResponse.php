@@ -28,9 +28,7 @@ class LlmResponse extends Model
         'scores' => 'array',
     ];
 
-    /**
-     * Extract clean text content from response_raw JSON
-     */
+    // get the main text from the response_raw json
     public function parsed_content(): string
     {
         $raw = json_decode($this->response_raw, true);
@@ -39,12 +37,12 @@ class LlmResponse extends Model
             return $raw['choices'][0]['message']['content'];
         }
         
-        // Fallback: if it's already a string, return as is
+        // if it's already a string, just return it
         if (is_string($raw)) {
             return $raw;
         }
         
-        // Last resort: return empty string
+        // if nothing else, return empty string
         return '';
     }
 }

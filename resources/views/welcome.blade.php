@@ -2,7 +2,7 @@
 
 @section('content')
 <main class="container py-4">
-  <!-- Header and Add Buttons -->
+  <!-- header and add buttons -->
   <div class="row align-items-center mb-5 g-4">
     <div class="col-md-auto d-flex gap-3">
       <button class="btn btn-primary btn-lg d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#scenarioModal"><i class="fas fa-plus-circle"></i> New Scenario</button>
@@ -10,7 +10,7 @@
     </div>
   </div>
   <div class="row g-5">
-    <!-- Scenarios Column -->
+    <!-- scenarios column -->
     <section class="col-lg-8">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h2 class="h2 fw-bold text-primary d-flex align-items-center gap-2">Scenarios</h2>
@@ -27,7 +27,7 @@
         <x-pagination :paginator="$scenarios" />
       </div>
     </section>
-    <!-- Personas Column as Grid -->
+    <!-- personas column as grid -->
     <aside class="col-lg-4">
       <div class="d-flex align-items-center justify-content-between mb-3">
         <h2 class="h2 fw-bold text-success d-flex align-items-center gap-2">Personas</h2>

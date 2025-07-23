@@ -19,14 +19,16 @@ class RunPromptJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    // set up the job with test run, model key, and temperature
     public function __construct(
         public TestRun $testRun,
-        public string  $modelKey,          // e.g. "openai_gpt4o"
+        public string  $modelKey,          // like "openai_gpt4o"
         public float   $temperature = 0.7,
     ) {
         $this->onQueue('llm');
     }
 
+    // what the job does
     public function handle(OpenRouterProvider $provider): void
     {
         Log::info('RunPromptJob::handle started', [
@@ -35,7 +37,7 @@ class RunPromptJob implements ShouldQueue
             'temperature' => $this->temperature,
         ]);
 
-        // Build composite prompt from scenario + persona snapshots
+        // make the prompt from scenario and persona
         $prompt = PromptBuilder::fromTestRun($this->testRun);
 
         try {
@@ -53,7 +55,7 @@ class RunPromptJob implements ShouldQueue
             return;
         }
 
-        // Persist response
+        // save the response
         $llmResponse = $this->testRun->llmResponses()->create([
             'provider'     => 'openrouter',
             'model'        => config("models.{$this->modelKey}"),
@@ -65,7 +67,7 @@ class RunPromptJob implements ShouldQueue
             'scores'       => null,
         ]);
 
-        // Broadcast raw answer back to UI
+        // send the answer to the ui
         event(new LlmResponseCreated(
             testRunId: $this->testRun->id,
             modelKey:  $this->modelKey,
@@ -73,16 +75,17 @@ class RunPromptJob implements ShouldQueue
             latencyMs: $result['latency_ms'],
         ));
 
-        // Dispatch bias scoring job
+        // start the bias scoring job
         BiasScoringJob::dispatch($llmResponse)->onQueue('scoring');
 
-        // Mark test‑run completed for this individual response
+        // mark the test run as done
         $this->testRun->update([
             'status'       => 'completed',
             'completed_at' => now(),
         ]);
     }
 
+    // tags for the job
     public function tags(): array
     {
         return [

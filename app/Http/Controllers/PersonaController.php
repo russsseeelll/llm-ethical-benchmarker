@@ -7,26 +7,20 @@ use Illuminate\Http\Request;
 
 class PersonaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // show all personas
     public function index()
     {
         $personas = \App\Models\Persona::orderBy('created_at', 'desc')->paginate(10);
         return view('welcome', compact('personas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // show the form to make a new persona
     public function create()
     {
         return redirect('/');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // save a new persona
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -36,7 +30,7 @@ class PersonaController extends Controller
             'revision' => 'nullable|integer',
         ]);
         if (!empty($data['metadata']) && is_string($data['metadata'])) {
-            json_decode($data['metadata']); // Validate JSON
+            json_decode($data['metadata']); // check if json is valid
             if (json_last_error() !== JSON_ERROR_NONE) {
                 return back()->withErrors(['metadata' => 'Invalid JSON'])->withInput();
             }
@@ -46,25 +40,19 @@ class PersonaController extends Controller
         return redirect('/')->with('success', 'Persona created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // show a single persona (not used)
     public function show($id)
     {
         return redirect('/');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // show the form to edit a persona
     public function edit($id)
     {
         return redirect('/');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // update a persona
     public function update(Request $request, $id)
     {
         $persona = \App\Models\Persona::findOrFail($id);
@@ -85,9 +73,7 @@ class PersonaController extends Controller
         return redirect('/')->with('success', 'Persona updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // delete a persona
     public function destroy($id)
     {
         $persona = \App\Models\Persona::findOrFail($id);

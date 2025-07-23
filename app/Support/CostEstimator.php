@@ -10,6 +10,7 @@ class CostEstimator
         'deepseek_fp8'  => 0.000002,  
     ];
 
+    // get the estimated cost for a model and token count
     public static function estimate(string $modelKey, int $totalTokens): float
     {
         $rate = self::RATES[$modelKey] ?? 0.00001;

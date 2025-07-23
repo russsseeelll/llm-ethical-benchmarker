@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 
 class HumanResponseController extends Controller
 {
+    // show the form to answer the questionnaire
     public function create()
     {
         return view('human_questionnaire');
     }
 
+    // save a new human response
     public function store(Request $request)
     {
         $data = $request->validate([
