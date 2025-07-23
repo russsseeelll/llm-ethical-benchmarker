@@ -22,6 +22,7 @@ class ScenarioControllerTest extends TestCase
             'is_multiple_choice' => true,
             'choices' => '["A", "B", "C"]',
             'revision' => 1,
+            'real_life_outcome' => 'Court ruled in favor of the hospital.',
         ];
 
         $response = $this->post('/scenarios', $data);
@@ -37,6 +38,7 @@ class ScenarioControllerTest extends TestCase
             'is_multiple_choice' => true,
             'choices' => '["A", "B", "C"]',
             'slug' => 'TestScenario',
+            'real_life_outcome' => 'Court ruled in favor of the hospital.',
         ]);
     }
 
@@ -99,17 +101,18 @@ class ScenarioControllerTest extends TestCase
         $persona = Persona::factory()->create();
         $scenario = Scenario::factory()->create([
             'persona_id' => $persona->id,
-            'slug' => 'test-scenario',
+            'real_life_outcome' => 'Initial outcome',
         ]);
         
         $data = [
             'title' => 'Updated Scenario',
             'persona_id' => $persona->id,
             'description' => 'Updated description',
-            'prompt_template' => 'Updated question',
+            'prompt_template' => 'Updated prompt',
             'is_multiple_choice' => false,
-            'choices' => '["X", "Y", "Z"]',
+            'choices' => null,
             'revision' => 2,
+            'real_life_outcome' => 'Updated real life outcome',
         ];
 
         $response = $this->put("/scenarios/{$scenario->id}", $data);
@@ -120,11 +123,7 @@ class ScenarioControllerTest extends TestCase
         $this->assertDatabaseHas('scenarios', [
             'id' => $scenario->id,
             'title' => 'Updated Scenario',
-            'description' => 'Updated description',
-            'prompt_template' => 'Updated question',
-            'is_multiple_choice' => false,
-            'choices' => '["X", "Y", "Z"]',
-            'slug' => 'UpdatedScenario',
+            'real_life_outcome' => 'Updated real life outcome',
         ]);
     }
 

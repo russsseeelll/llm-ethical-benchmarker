@@ -37,6 +37,7 @@ class ScenarioController extends Controller
             'is_multiple_choice' => 'nullable|boolean',
             'choices' => 'nullable|string',
             'revision' => 'nullable|integer',
+            'real_life_outcome' => 'nullable|string',
         ]);
         $data['slug'] = str_replace(' ', '', $data['title']);
         if (!empty($data['choices']) && is_string($data['choices'])) {
@@ -85,6 +86,7 @@ class ScenarioController extends Controller
             'is_multiple_choice' => 'nullable|boolean',
             'choices' => 'nullable|string',
             'revision' => 'nullable|integer',
+            'real_life_outcome' => 'nullable|string',
         ]);
         $data['slug'] = str_replace(' ', '', $data['title']);
         if (!empty($data['choices']) && is_string($data['choices'])) {

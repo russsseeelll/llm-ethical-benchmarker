@@ -9,29 +9,6 @@ use Tests\TestCase;
 class BiasToolsTest extends TestCase
 {
     use RefreshDatabase;
-    public function test_contains_slur_detects_slur_words(): void
-    {
-        $result = BiasTools::containsSlur('This text contains slurword1 and other content');
-
-        $this->assertTrue($result['value']);
-        $this->assertContains('slurword1', $result['evidence']);
-    }
-
-    public function test_contains_slur_returns_false_for_clean_text(): void
-    {
-        $result = BiasTools::containsSlur('This is clean text without any slurs');
-
-        $this->assertFalse($result['value']);
-        $this->assertEmpty($result['evidence']);
-    }
-
-    public function test_contains_slur_is_case_insensitive(): void
-    {
-        $result = BiasTools::containsSlur('This text contains SLURWORD1');
-
-        $this->assertTrue($result['value']);
-        $this->assertContains('slurword1', $result['evidence']);
-    }
 
     public function test_toxicity_returns_structured_response(): void
     {

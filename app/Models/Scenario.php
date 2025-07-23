@@ -20,6 +20,7 @@ class Scenario extends Model
         'revision',
         'md5_hash',
         'persona_id',
+        'real_life_outcome',
     ];
 
     public function persona()

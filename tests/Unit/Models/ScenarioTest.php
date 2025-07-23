@@ -79,4 +79,14 @@ class ScenarioTest extends TestCase
         $expectedHash = md5('Test Scenario' . 'You are helpful');
         $this->assertEquals($expectedHash, $scenario->md5_hash);
     }
+
+    public function test_scenario_can_have_real_life_outcome(): void
+    {
+        $persona = Persona::factory()->create();
+        $scenario = Scenario::factory()->create([
+            'persona_id' => $persona->id,
+            'real_life_outcome' => 'Outcome text here.'
+        ]);
+        $this->assertEquals('Outcome text here.', $scenario->real_life_outcome);
+    }
 } 

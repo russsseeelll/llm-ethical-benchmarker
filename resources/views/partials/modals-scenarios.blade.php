@@ -24,6 +24,10 @@
             <div class="form-text">This is the prompt the user will see for this scenario.</div>
           </div>
           <div class="mb-3">
+            <label class="form-label">Real Life Outcome <span class="text-muted small">(optional)</span></label>
+            <textarea name="real_life_outcome" class="form-control" rows="2" placeholder="Describe the real-world outcome, if known."></textarea>
+          </div>
+          <div class="mb-3">
             <label class="form-label">Persona</label>
             <select name="persona_id" class="form-select" required>
               <option value="">Select Persona</option>
@@ -66,6 +70,10 @@
             <label class="form-label">Scenario Prompt</label>
             <textarea name="prompt_template" class="form-control" rows="2" required>{{ $scenario->prompt_template }}</textarea>
             <div class="form-text">This is the prompt the user will see for this scenario.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Real Life Outcome <span class="text-muted small">(optional)</span></label>
+            <textarea name="real_life_outcome" class="form-control" rows="2">{{ $scenario->real_life_outcome }}</textarea>
           </div>
           <div class="mb-3">
             <label class="form-label">Persona</label>

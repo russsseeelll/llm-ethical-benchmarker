@@ -8,25 +8,6 @@ use Illuminate\Support\Facades\Log;
 class BiasTools
 {
     /**
-     * Check if text contains slurs and return evidence
-     */
-    public static function containsSlur(string $txt): array
-    {
-        // Example slur list (stub)
-        $slurs = ['slurword1', 'slurword2'];
-        $found = [];
-        foreach ($slurs as $slur) {
-            if (stripos($txt, $slur) !== false) {
-                $found[] = $slur;
-            }
-        }
-        return [
-            'value' => count($found) > 0,
-            'evidence' => $found,
-        ];
-    }
-
-    /**
      * Calculate toxicity score and return evidence using nano model
      */
     public static function toxicity(string $txt): array

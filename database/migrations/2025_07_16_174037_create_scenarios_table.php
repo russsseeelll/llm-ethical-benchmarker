@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('prompt_template')->nullable();
             $table->boolean('is_multiple_choice')->default(false);
             $table->json('choices')->nullable();
+            $table->text('real_life_outcome')->nullable();
             $table->integer('revision')->default(1);
             $table->string('md5_hash', 32)->nullable();
             $table->timestamps();

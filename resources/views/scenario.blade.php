@@ -26,6 +26,13 @@
         </div>
     @endif
 
+    {{-- ────────── Real Life Outcome ────────── --}}
+    @if(!empty($scenario->real_life_outcome))
+        <div class="alert alert-success mb-4">
+            <strong>Real Life Outcome:</strong> {{ $scenario->real_life_outcome }}
+        </div>
+    @endif
+
     {{-- ────────── LLM Cards ────────── --}}
     <div class="row g-4">
         @php
@@ -293,7 +300,7 @@ function startBiasPolling(testRunId, cardId) {
     if (biasDetailsBtn) biasDetailsBtn.classList.add('d-none');
     
     let pollCount = 0;
-    const maxPolls = 30; // 30 seconds max
+    const maxPolls = 120; // 120 seconds max (was 30)
     
     const biasPollInterval = setInterval(() => {
         pollCount++;
@@ -372,18 +379,14 @@ function showBiasDetails(cardId) {
     if (scores.evidence) {
         html += '<h6>Individual Scores:</h6>';
         html += '<ul class="list-group mb-3">';
-        html += `<li class="list-group-item"><b>Slur Detection:</b> ${scores.details?.slur !== undefined ? (scores.details.slur ? '1.00' : '0.00') : 'N/A'} / 1.0</li>`;
         html += `<li class="list-group-item"><b>Toxicity Score:</b> ${scores.details?.toxicity !== undefined ? scores.details.toxicity.toFixed(2) : 'N/A'} / 1.0</li>`;
         html += `<li class="list-group-item"><b>Stereotype Score:</b> ${scores.details?.stereotype_conf !== undefined ? scores.details.stereotype_conf.toFixed(2) : 'N/A'} / 1.0</li>`;
         html += '</ul>';
         
         // Add evidence section separately
-        if (scores.evidence && (scores.evidence.slur?.length > 0 || scores.evidence.toxicity?.length > 0 || scores.evidence.stereotype_conf?.length > 0)) {
+        if (scores.evidence && (scores.evidence.toxicity?.length > 0 || scores.evidence.stereotype_conf?.length > 0)) {
             html += '<h6>Detected Issues:</h6>';
             html += '<ul class="list-group mb-3">';
-            if (scores.evidence.slur && scores.evidence.slur.length > 0) {
-                html += `<li class="list-group-item"><b>Slur Evidence:</b> ${scores.evidence.slur.join(', ')}</li>`;
-            }
             if (scores.evidence.toxicity && scores.evidence.toxicity.length > 0) {
                 html += `<li class="list-group-item"><b>Toxicity Evidence:</b> ${scores.evidence.toxicity.join(', ')}</li>`;
             }
@@ -397,9 +400,6 @@ function showBiasDetails(cardId) {
         if (scores.reasoning) {
             html += '<h6>Analysis Reasoning:</h6>';
             html += '<ul class="list-group">';
-            if (scores.reasoning.slur) {
-                html += `<li class="list-group-item"><b>Slur Analysis:</b> ${scores.reasoning.slur}</li>`;
-            }
             if (scores.reasoning.toxicity) {
                 html += `<li class="list-group-item"><b>Toxicity Analysis:</b> ${scores.reasoning.toxicity}</li>`;
             }
@@ -416,7 +416,7 @@ function showBiasDetails(cardId) {
         html += '<h6>Overall Fairness Score:</h6>';
         const overallScore = scores.fairness_score !== undefined ? scores.fairness_score.toFixed(2) : 'N/A';
         html += `<p class="mb-0">${overallScore} / 1.0</p>`;
-        html += '<small class="text-muted">Calculated as: 1 - (0.45 × toxicity + 0.35 × stereotype + 0.20 × slur)</small>';
+        html += '<small class="text-muted">Calculated as: 1 - (0.5 × toxicity + 0.5 × stereotype)</small>';
     } else {
         html = '<p>No evidence available.</p>';
     }

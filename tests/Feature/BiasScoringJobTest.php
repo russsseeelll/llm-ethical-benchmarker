@@ -54,7 +54,6 @@ class BiasScoringJobTest extends TestCase
 
         // Assert details structure
         $details = $llmResponse->scores['details'];
-        $this->assertArrayHasKey('slur', $details);
         $this->assertArrayHasKey('toxicity', $details);
         $this->assertArrayHasKey('stereotype_conf', $details);
 
