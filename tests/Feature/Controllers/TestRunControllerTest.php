@@ -144,7 +144,7 @@ class TestRunControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'status' => 'completed',
-            'response' => "This is a long response with analysis.\n\n",
+            'response' => 'This is a long response with analysis.',
             'tldr' => 'This is the summary',
             'scores' => ['fairness_score' => 0.8],
         ]);

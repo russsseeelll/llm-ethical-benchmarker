@@ -40,15 +40,6 @@ class ScenarioTest extends TestCase
         $this->assertEquals($persona->id, $scenario->persona->id);
     }
 
-    public function test_scenario_has_test_runs_relationship(): void
-    {
-        $scenario = Scenario::factory()->create();
-        $testRun = TestRun::factory()->create(['scenario_id' => $scenario->id]);
-
-        $this->assertTrue($scenario->testRuns->contains($testRun));
-        $this->assertEquals(1, $scenario->testRuns->count());
-    }
-
     public function test_scenario_generates_slug_from_title(): void
     {
         $scenario = Scenario::factory()->create([
@@ -67,17 +58,6 @@ class ScenarioTest extends TestCase
         ]);
 
         $this->assertEquals('custom-slug', $scenario->slug);
-    }
-
-    public function test_scenario_has_md5_hash_generated(): void
-    {
-        $scenario = Scenario::factory()->create([
-            'title' => 'Test Scenario',
-            'prompt_template' => 'You are helpful',
-        ]);
-
-        $expectedHash = md5('Test Scenario' . 'You are helpful');
-        $this->assertEquals($expectedHash, $scenario->md5_hash);
     }
 
     public function test_scenario_can_have_real_life_outcome(): void

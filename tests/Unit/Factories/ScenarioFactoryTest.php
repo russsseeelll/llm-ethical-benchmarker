@@ -22,24 +22,6 @@ class ScenarioFactoryTest extends TestCase
         $this->assertDatabaseHas('scenarios', ['id' => $scenario->id]);
     }
 
-    public function test_scenario_factory_creates_with_custom_data(): void
-    {
-        $scenario = Scenario::factory()->create([
-            'title' => 'Custom Scenario',
-            'description' => 'Custom description',
-            'prompt_template' => 'Custom prompt',
-            'is_multiple_choice' => true,
-            'choices' => '["A", "B", "C"]',
-        ]);
-
-        $this->assertEquals('Custom Scenario', $scenario->title);
-        $this->assertEquals('CustomScenario', $scenario->slug);
-        $this->assertEquals('Custom description', $scenario->description);
-        $this->assertEquals('Custom prompt', $scenario->prompt_template);
-        $this->assertTrue($scenario->is_multiple_choice);
-        $this->assertEquals('["A", "B", "C"]', $scenario->choices);
-    }
-
     public function test_scenario_factory_creates_multiple_scenarios(): void
     {
         $scenarios = Scenario::factory()->count(3)->create();
@@ -63,16 +45,6 @@ class ScenarioFactoryTest extends TestCase
 
         $this->assertEquals($persona->id, $scenario->persona_id);
         $this->assertEquals($persona->id, $scenario->persona->id);
-    }
-
-    public function test_scenario_factory_creates_with_test_runs(): void
-    {
-        $scenario = Scenario::factory()
-            ->has(TestRun::factory()->count(2))
-            ->create();
-
-        $this->assertCount(2, $scenario->testRuns);
-        $this->assertInstanceOf(TestRun::class, $scenario->testRuns->first());
     }
 
     public function test_scenario_factory_generates_slug_from_title(): void

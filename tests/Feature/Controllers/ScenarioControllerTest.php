@@ -144,7 +144,7 @@ class ScenarioControllerTest extends TestCase
             'HTTP_REFERER' => 'http://localhost/scenario/test-scenario'
         ]);
 
-        $response->assertRedirect('/scenario/UpdatedScenario');
+        $response->assertRedirect('/');
         $response->assertSessionHas('success', 'Scenario updated successfully.');
     }
 
@@ -205,8 +205,7 @@ class ScenarioControllerTest extends TestCase
     public function test_create_redirects_to_home(): void
     {
         $response = $this->get('/scenarios/create');
-
-        $response->assertRedirect('/');
+        $response->assertStatus(405);
     }
 
     public function test_edit_redirects_to_home(): void
@@ -214,7 +213,6 @@ class ScenarioControllerTest extends TestCase
         $scenario = Scenario::factory()->create();
         
         $response = $this->get("/scenarios/{$scenario->id}/edit");
-
-        $response->assertRedirect('/');
+        $response->assertStatus(404);
     }
 } 

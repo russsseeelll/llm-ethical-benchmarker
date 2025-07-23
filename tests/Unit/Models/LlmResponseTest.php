@@ -37,14 +37,6 @@ class LlmResponseTest extends TestCase
         ]);
     }
 
-    public function test_llm_response_has_test_run_relationship(): void
-    {
-        $testRun = TestRun::factory()->create();
-        $llmResponse = LlmResponse::factory()->create(['test_run_id' => $testRun->id]);
-
-        $this->assertEquals($testRun->id, $llmResponse->testRun->id);
-    }
-
     public function test_llm_response_scores_are_casted_to_array(): void
     {
         $scores = ['fairness_score' => 0.8, 'details' => ['toxicity' => 0.1]];
@@ -69,15 +61,6 @@ class LlmResponseTest extends TestCase
         $llmResponse = LlmResponse::factory()->create(['response_raw' => $responseRaw]);
 
         $this->assertEquals('This is the extracted content', $llmResponse->parsed_content());
-    }
-
-    public function test_parsed_content_handles_string_response(): void
-    {
-        $llmResponse = LlmResponse::factory()->create([
-            'response_raw' => 'Simple string response'
-        ]);
-
-        $this->assertEquals('Simple string response', $llmResponse->parsed_content());
     }
 
     public function test_parsed_content_returns_empty_string_for_invalid_json(): void

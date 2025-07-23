@@ -12,7 +12,6 @@ class BiasScoredTest extends TestCase
     public function test_event_has_correct_properties(): void
     {
         $scores = ['fairness_score' => 0.8, 'details' => ['toxicity' => 0.1]];
-        
         $event = new BiasScored(
             testRunId: 123,
             modelKey: 'openai_gpt4o',
@@ -43,7 +42,6 @@ class BiasScoredTest extends TestCase
     public function test_event_broadcasts_correct_data(): void
     {
         $scores = ['fairness_score' => 0.8, 'details' => ['toxicity' => 0.1]];
-        
         $event = new BiasScored(123, 'openai_gpt4o', $scores);
 
         $broadcastData = $event->broadcastWith();

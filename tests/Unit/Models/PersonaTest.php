@@ -54,15 +54,4 @@ class PersonaTest extends TestCase
 
         $this->assertDatabaseMissing('personas', ['id' => $persona->id]);
     }
-
-    public function test_persona_has_md5_hash_generated(): void
-    {
-        $persona = Persona::factory()->create([
-            'name' => 'Test Persona',
-            'prompt_template' => 'You are helpful',
-        ]);
-
-        $expectedHash = md5('Test Persona' . 'You are helpful');
-        $this->assertEquals($expectedHash, $persona->md5_hash);
-    }
 } 

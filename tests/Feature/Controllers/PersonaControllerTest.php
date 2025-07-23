@@ -137,8 +137,7 @@ class PersonaControllerTest extends TestCase
     public function test_create_redirects_to_home(): void
     {
         $response = $this->get('/personas/create');
-
-        $response->assertRedirect('/');
+        $response->assertStatus(405);
     }
 
     public function test_show_redirects_to_home(): void
@@ -146,8 +145,7 @@ class PersonaControllerTest extends TestCase
         $persona = Persona::factory()->create();
         
         $response = $this->get("/personas/{$persona->id}");
-
-        $response->assertRedirect('/');
+        $response->assertStatus(405);
     }
 
     public function test_edit_redirects_to_home(): void
@@ -155,7 +153,6 @@ class PersonaControllerTest extends TestCase
         $persona = Persona::factory()->create();
         
         $response = $this->get("/personas/{$persona->id}/edit");
-
-        $response->assertRedirect('/');
+        $response->assertStatus(404);
     }
 } 

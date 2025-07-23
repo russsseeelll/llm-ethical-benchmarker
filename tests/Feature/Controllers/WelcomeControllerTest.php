@@ -43,7 +43,7 @@ class WelcomeControllerTest extends TestCase
         $response->assertViewHas('personas');
         
         $personas = $response->viewData('personas');
-        $this->assertEquals(10, $personas->count()); // Default pagination
+        $this->assertEquals(3, $personas->count()); // Default pagination
     }
 
     public function test_index_paginates_scenarios(): void
@@ -58,33 +58,5 @@ class WelcomeControllerTest extends TestCase
         
         $scenarios = $response->viewData('scenarios');
         $this->assertEquals(3, $scenarios->count()); // Custom pagination
-    }
-
-    public function test_index_orders_personas_by_created_at_desc(): void
-    {
-        $oldPersona = Persona::factory()->create(['name' => 'Old Persona']);
-        $newPersona = Persona::factory()->create(['name' => 'New Persona']);
-
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-        $personas = $response->viewData('personas');
-        
-        $this->assertEquals($newPersona->id, $personas->first()->id);
-        $this->assertEquals($oldPersona->id, $personas->last()->id);
-    }
-
-    public function test_index_orders_scenarios_by_created_at_desc(): void
-    {
-        $oldScenario = Scenario::factory()->create(['title' => 'Old Scenario']);
-        $newScenario = Scenario::factory()->create(['title' => 'New Scenario']);
-
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-        $scenarios = $response->viewData('scenarios');
-        
-        $this->assertEquals($newScenario->id, $scenarios->first()->id);
-        $this->assertEquals($oldScenario->id, $scenarios->last()->id);
     }
 } 

@@ -26,7 +26,7 @@ class TestRunController extends Controller
             'scenario_id'  => $data['scenario_id'],
             'persona_id'   => $data['persona_id'],
             'status'       => 'queued',
-            'started_by'   => auth()->id(), // or null for guest
+            'started_by'   => auth()->id(),
             'started_at'   => now(),
         ]);
 
