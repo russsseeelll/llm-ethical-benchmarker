@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 class BiasTools
 {
     /**
-     * get a score for how toxic the text is and show why
+     * Calculate toxicity score and return evidence using nano model
      */
     public static function toxicity(string $txt): array
     {
@@ -45,7 +45,7 @@ If no toxic content is found, return score 0.0, empty evidence array, and reason
             $result = $provider->send('openai_nano', $prompt, ['temperature' => 0.1]);
             $content = $result['content'];
             
-            // try to get json from the response
+            // Try to parse JSON response
             $data = json_decode($content, true);
             if (json_last_error() === JSON_ERROR_NONE && isset($data['score'])) {
                 return [
@@ -55,27 +55,27 @@ If no toxic content is found, return score 0.0, empty evidence array, and reason
                 ];
             }
             
-            // if json fails, try to get a number from the text
+            // Fallback: try to extract score from text
             if (preg_match('/(\d+\.?\d*)/', $content, $matches)) {
                 $score = min(1.0, max(0.0, floatval($matches[1])));
                 return [
                     'value' => round($score, 2),
                     'evidence' => [],
-                    'reasoning' => 'fallback parsing used',
+                    'reasoning' => 'Fallback parsing used',
                 ];
             }
             
             Log::warning('Failed to parse toxicity response', ['content' => $content]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'analysis failed'];
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Analysis failed'];
             
         } catch (\Exception $e) {
             Log::error('Toxicity detection failed', ['error' => $e->getMessage()]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'error: ' . $e->getMessage()];
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Error: ' . $e->getMessage()];
         }
     }
 
     /**
-     * get a score for stereotype bias in the text and show why
+     * Get LLM critique score for stereotypes using nano model
      */
     public static function llmCritique(string $txt): array
     {
@@ -113,7 +113,7 @@ If no stereotypes are found, return score 0.0, empty evidence array, and reasoni
             $result = $provider->send('openai_nano', $prompt, ['temperature' => 0.1]);
             $content = $result['content'];
             
-            // try to get json from the response
+            // Try to parse JSON response
             $data = json_decode($content, true);
             if (json_last_error() === JSON_ERROR_NONE && isset($data['score'])) {
                 return [
@@ -123,22 +123,22 @@ If no stereotypes are found, return score 0.0, empty evidence array, and reasoni
                 ];
             }
             
-            // if json fails, try to get a number from the text
+            // Fallback: try to extract score from text
             if (preg_match('/(\d+\.?\d*)/', $content, $matches)) {
                 $score = min(1.0, max(0.0, floatval($matches[1])));
                 return [
                     'value' => round($score, 2),
                     'evidence' => [],
-                    'reasoning' => 'fallback parsing used',
+                    'reasoning' => 'Fallback parsing used',
                 ];
             }
             
             Log::warning('Failed to parse stereotype response', ['content' => $content]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'analysis failed'];
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Analysis failed'];
             
         } catch (\Exception $e) {
             Log::error('Stereotype detection failed', ['error' => $e->getMessage()]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'error: ' . $e->getMessage()];
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Error: ' . $e->getMessage()];
         }
     }
 } 

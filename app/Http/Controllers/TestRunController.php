@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 
 class TestRunController extends Controller
 {
-    // save a new test run and start the job
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -59,7 +58,6 @@ class TestRunController extends Controller
         return response()->json(['test_run_id' => $testRun->id], 202);
     }
 
-    // get the status and latest response for a test run
     public function status(TestRun $testRun)
     {
         $latestResponse = $testRun->llmResponses()->latest()->first();
@@ -72,10 +70,10 @@ class TestRunController extends Controller
             $fullResponse = $rawData['choices'][0]['message']['content'] ?? null;
             
             if ($fullResponse) {
-                // try to get tldr if it is there
+                // Extract TLDR if present
                 if (preg_match('/TLDR:\s*(.+)$/m', $fullResponse, $matches)) {
                     $tldr = trim($matches[1]);
-                    // remove tldr from the main response
+                    // Remove TLDR from full response for display
                     $response = preg_replace('/\s*TLDR:\s*.+$/m', '', $fullResponse);
                 } else {
                     $response = $fullResponse;

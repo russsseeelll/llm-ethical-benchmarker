@@ -1,4 +1,4 @@
-{{-- gdpr consent modal --}}
+{{-- GDPR Consent Modal --}}
 @if ($showConsentModal)
 <div class="modal fade show" id="gdprConsentModal" tabindex="-1" aria-labelledby="gdprConsentModalLabel" aria-modal="true" role="dialog" style="display: block; background: rgba(0,0,0,0.5);">
   <div class="modal-dialog modal-dialog-centered">

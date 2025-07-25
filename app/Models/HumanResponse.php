@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class HumanResponse extends Model
 {
+    /** @use HasFactory<\Database\Factories\HumanResponseFactory> */
     use HasFactory;
 
     protected $fillable = [

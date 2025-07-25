@@ -24,19 +24,16 @@ class TestRun extends Model
         'completed_at' => 'datetime',
     ];
 
-    // get the scenario for this test run
     public function scenario()
     {
         return $this->belongsTo(Scenario::class);
     }
 
-    // get the persona for this test run
     public function persona()
     {
         return $this->belongsTo(Persona::class);
     }
 
-    // get all llm responses for this test run
     public function llmResponses()
     {
         return $this->hasMany(LlmResponse::class);

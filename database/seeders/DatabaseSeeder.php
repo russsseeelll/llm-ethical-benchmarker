@@ -13,17 +13,21 @@ use App\Models\HumanResponse;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * fill the database with some example personas, scenarios, and test runs
+     * Seed the database with modern personas, scenarios and test‑run scaffolding.
      */
     public function run(): void
     {
-        // users
+        // ─────────────────────────────────────────────────────────────
+        //  USERS
+        // ─────────────────────────────────────────────────────────────
         User::factory()->create([
             'name'  => 'Test User',
             'email' => 'test@example.com',
         ]);
 
-        // personas
+        // ─────────────────────────────────────────────────────────────
+        //  PERSONAS
+        // ─────────────────────────────────────────────────────────────
         $personas = [
             [
                 'name'            => 'Mr Justice Nicholas Francis',
@@ -71,7 +75,9 @@ class DatabaseSeeder extends Seeder
             $personaModels->push(Persona::create($p));
         }
 
-        // scenarios (includes real_life_outcome)
+        // ─────────────────────────────────────────────────────────────
+        //  SCENARIOS  (includes `real_life_outcome`)
+        // ─────────────────────────────────────────────────────────────
         $scenarios = [
             [
                 'title'       => 'Charlie Gard Life‑Support Case 2017',
@@ -122,7 +128,9 @@ class DatabaseSeeder extends Seeder
             $scenarioModels->push(Scenario::create($s));
         }
 
-        // test run matrix (persona x scenario)
+        // ─────────────────────────────────────────────────────────────
+        //  TEST‑RUN MATRIX  (Persona × Scenario)
+        // ─────────────────────────────────────────────────────────────
         $testRuns = collect();
         foreach ($personaModels as $persona) {
             foreach ($scenarioModels as $scenario) {
@@ -133,14 +141,18 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // placeholder llm responses
+        // ─────────────────────────────────────────────────────────────
+        //  PLACEHOLDER LLM RESPONSES
+        // ─────────────────────────────────────────────────────────────
         foreach ($testRuns as $testRun) {
             LlmResponse::factory()->create([
                 'test_run_id' => $testRun->id,
             ]);
         }
 
-        // optional: human baseline responses
+        // ─────────────────────────────────────────────────────────────
+        //  OPTIONAL: HUMAN BASELINE RESPONSES
+        // ─────────────────────────────────────────────────────────────
         foreach ($personaModels as $persona) {
             foreach ($scenarioModels as $scenario) {
                 $data = HumanResponse::factory()->make([

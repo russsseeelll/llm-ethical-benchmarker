@@ -9,7 +9,6 @@ use RuntimeException;
 
 class OpenRouterProvider
 {
-    // send a prompt to the model and get the result
     public function send(string $modelKey, string $prompt, array $options = []): array
     {
         $modelString = config("models.$modelKey");
@@ -30,7 +29,6 @@ class OpenRouterProvider
 
         $start = microtime(true);
 
-        // send the request to the api
         /** @var Response $response */
         $response = Http::withToken(env('OPEN_ROUTER_API_KEY'))
             ->withHeaders(config('openrouter.headers'))

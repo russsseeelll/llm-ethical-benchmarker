@@ -1,8 +1,8 @@
-<!-- card -->
+<!-- Card -->
 <div class="card scenario-card shadow-sm d-flex flex-column">
   <div class="card-body position-relative d-flex flex-column p-3">
 
-    <!-- kebab menu -->
+    <!-- Kebab‑menu -->
     <div class="dropdown ms-auto mb-2">
       <button class="btn btn-sm btn-light dropdown-toggle px-2" id="dropdownScenarioMenu-{{ $scenario->id }}"
               data-bs-toggle="dropdown" aria-expanded="false">
@@ -25,16 +25,16 @@
       </ul>
     </div>
 
-    <!-- title -->
+    <!-- Title -->
     <h3 class="h5 fw-bold text-primary text-truncate mb-1"
         title="{{ $scenario->title }}">{{ $scenario->title }}</h3>
 
-    <!-- description (2 line clamp) -->
+    <!-- Description (2‑line clamp) -->
     <p class="text-secondary flex-grow-1 mb-3 card-description">
       {{ $scenario->description }}
     </p>
 
-    <!-- cta -->
+    <!-- CTA -->
     <a href="{{ route('scenario.show', $scenario->slug) }}"
        class="btn btn-outline-primary w-100 mt-auto">
       Select Scenario

@@ -23,13 +23,11 @@ class Scenario extends Model
         'real_life_outcome',
     ];
 
-    // get the persona for this scenario
     public function persona()
     {
         return $this->belongsTo(Persona::class);
     }
 
-    // make a slug if missing
     protected static function boot()
     {
         parent::boot();

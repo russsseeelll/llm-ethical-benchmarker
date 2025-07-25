@@ -1,5 +1,5 @@
-{{-- scenario modals --}}
-<!-- new scenario modal -->
+{{-- Scenario Modals --}}
+<!-- New Scenario Modal -->
 <div class="modal fade" id="scenarioModal" tabindex="-1" aria-labelledby="scenarioModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -45,7 +45,7 @@
     </div>
   </div>
 </div>
-<!-- edit/delete modals for scenarios -->
+<!-- Edit/Delete Modals for Scenarios -->
 @foreach ($scenarios as $scenario)
 <div class="modal fade" id="editScenarioModal-{{ $scenario->id }}" tabindex="-1" aria-labelledby="editScenarioModalLabel-{{ $scenario->id }}" aria-hidden="true">
   <div class="modal-dialog">

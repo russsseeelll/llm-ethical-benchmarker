@@ -7,20 +7,26 @@ use Illuminate\Http\Request;
 
 class ScenarioController extends Controller
 {
-    // show all scenarios
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
         $scenarios = \App\Models\Scenario::orderBy('created_at', 'desc')->paginate(3);
         return view('welcome', compact('scenarios'));
     }
 
-    // show the form to make a new scenario
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         return redirect('/');
     }
 
-    // save a new scenario
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -35,7 +41,7 @@ class ScenarioController extends Controller
         ]);
         $data['slug'] = str_replace(' ', '', $data['title']);
         if (!empty($data['choices']) && is_string($data['choices'])) {
-            json_decode($data['choices']); // check if json is valid
+            json_decode($data['choices']); // Validate JSON
             if (json_last_error() !== JSON_ERROR_NONE) {
                 return back()->withErrors(['choices' => 'Invalid JSON'])->withInput();
             }
@@ -45,7 +51,9 @@ class ScenarioController extends Controller
         return redirect('/')->with('success', 'Scenario created successfully.');
     }
 
-    // show a single scenario
+    /**
+     * Display the specified resource.
+     */
     public function show($slug)
     {
         $scenario = \App\Models\Scenario::where('slug', $slug)->with('persona')->firstOrFail();
@@ -56,13 +64,17 @@ class ScenarioController extends Controller
         return view('scenario', compact('scenario', 'allPersonas', 'scenarios', 'personas', 'showConsentModal'));
     }
 
-    // show the form to edit a scenario
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit($id)
     {
         return redirect('/');
     }
 
-    // update a scenario
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, $id)
     {
         $scenario = \App\Models\Scenario::where('slug', $id)->orWhere('id', $id)->firstOrFail();
@@ -85,7 +97,7 @@ class ScenarioController extends Controller
         }
         $data['md5_hash'] = md5($data['title'] . ($data['prompt_template'] ?? ''));
         $scenario->update($data);
-        // check if the edit was made from the scenario page or welcome page
+        // Check if the edit was made from the scenario page or welcome page
         $referer = $request->header('HTTP_REFERER');
         if ($referer && str_contains($referer, '/scenario/')) {
             return redirect()->route('scenario.show', $data['slug'])->with('success', 'Scenario updated successfully.');
@@ -93,7 +105,9 @@ class ScenarioController extends Controller
         return redirect('/')->with('success', 'Scenario updated successfully.');
     }
 
-    // delete a scenario
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy($id)
     {
         $scenario = \App\Models\Scenario::where('slug', $id)->orWhere('id', $id)->firstOrFail();

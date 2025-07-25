@@ -1,5 +1,5 @@
-{{-- persona modals --}}
-<!-- new persona modal -->
+{{-- Persona Modals --}}
+<!-- New Persona Modal -->
 <div class="modal fade" id="personaModal" tabindex="-1" aria-labelledby="personaModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -32,7 +32,7 @@
     </div>
   </div>
 </div>
-<!-- edit/delete modals for personas -->
+<!-- Edit/Delete Modals for Personas -->
 @foreach ($personas as $persona)
 <div class="modal fade" id="editPersonaModal-{{ $persona->id }}" tabindex="-1" aria-labelledby="editPersonaModalLabel-{{ $persona->id }}" aria-hidden="true">
   <div class="modal-dialog">
