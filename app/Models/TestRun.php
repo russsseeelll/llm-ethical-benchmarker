@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TestRun extends Model
 {
     /** @use HasFactory<\Database\Factories\TestRunFactory> */
+    // this lets us use the factory for this model
     use HasFactory;
 
     protected $fillable = [
@@ -26,16 +27,19 @@ class TestRun extends Model
 
     public function scenario()
     {
+        // this gets the scenario for this test run
         return $this->belongsTo(Scenario::class);
     }
 
     public function persona()
     {
+        // this gets the persona for this test run
         return $this->belongsTo(Persona::class);
     }
 
     public function llmResponses()
     {
+        // this gets all llm responses for this test run
         return $this->hasMany(LlmResponse::class);
     }
 }

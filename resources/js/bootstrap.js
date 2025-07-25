@@ -1,3 +1,4 @@
+// this file sets up axios for us to use everywhere
 import axios from 'axios';
 window.axios = axios;
 

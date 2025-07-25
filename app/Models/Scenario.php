@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Scenario extends Model
 {
     /** @use HasFactory<\Database\Factories\ScenarioFactory> */
+    // this lets us use the factory for this model
     use HasFactory;
 
     protected $fillable = [
@@ -25,6 +26,7 @@ class Scenario extends Model
 
     public function persona()
     {
+        // this gets the persona for this scenario
         return $this->belongsTo(Persona::class);
     }
 
@@ -32,6 +34,7 @@ class Scenario extends Model
     {
         parent::boot();
         static::saving(function ($scenario) {
+            // if slug is empty, make it from the title (no spaces)
             if (empty($scenario->slug) && !empty($scenario->title)) {
                 $scenario->slug = str_replace(' ', '', $scenario->title);
             }

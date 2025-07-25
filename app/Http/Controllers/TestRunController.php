@@ -22,6 +22,7 @@ class TestRunController extends Controller
         ]);
 
         /** @var TestRun $testRun */
+        // this makes a new test run
         $testRun = TestRun::create([
             'scenario_id'  => $data['scenario_id'],
             'persona_id'   => $data['persona_id'],
@@ -71,10 +72,10 @@ class TestRunController extends Controller
             
             if ($fullResponse) {
                 // Extract TLDR if present
-                if (preg_match('/TLDR:\s*(.+)$/m', $fullResponse, $matches)) {
+                if (preg_match('/TLDR:\\s*(.+)$/m', $fullResponse, $matches)) {
                     $tldr = trim($matches[1]);
                     // Remove TLDR from full response for display
-                    $response = preg_replace('/\s*TLDR:\s*.+$/m', '', $fullResponse);
+                    $response = preg_replace('/\\s*TLDR:\\s*.+$/m', '', $fullResponse);
                 } else {
                     $response = $fullResponse;
                 }

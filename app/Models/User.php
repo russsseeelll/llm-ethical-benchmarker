@@ -10,10 +10,11 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
+    // this lets us use the factory for this model
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * these are the fields us can fill in
      *
      * @var list<string>
      */
@@ -24,7 +25,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * these fields are hidden when us turn the user into an array
      *
      * @var list<string>
      */
@@ -34,7 +35,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * get the fields that should be cast
      *
      * @return array<string, string>
      */

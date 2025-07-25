@@ -14,6 +14,7 @@ class HumanResponseControllerTest extends TestCase
 
     public function test_store_validates_required_fields(): void
     {
+        // try posting with nothing, should fail
         $response = $this->post('/questionnaire', []);
 
         $response->assertSessionHasErrors(['scenario_id', 'response', 'consent']);
@@ -21,9 +22,10 @@ class HumanResponseControllerTest extends TestCase
 
     public function test_store_validates_scenario_exists(): void
     {
+        // try posting with a scenario id that doesn't exist
         $response = $this->post('/questionnaire', [
-            'scenario_id' => 999, // Non-existent scenario
-            'response' => 'Test response',
+            'scenario_id' => 999, // not a real scenario
+            'response' => 'test response',
             'consent' => 'on',
         ]);
 

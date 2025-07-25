@@ -1,7 +1,9 @@
+<!-- this is our persona card component, shows a persona in a nice box -->
 <div class="d-flex align-items-center gap-3 border rounded p-3 shadow-sm bg-white position-relative" style="min-height: 72px;">
   <div class="flex-grow-1">
     <div class="fw-semibold text-truncate" title="{{ $persona->name }}">{{ $persona->name }}</div>
     @if(!empty($persona->prompt_template))
+      <!-- show the prompt template if we have one -->
       <div class="small text-success mt-1"><strong>Prompt Template:</strong> {{ $persona->prompt_template }}</div>
     @endif
   </div>

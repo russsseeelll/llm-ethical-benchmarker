@@ -18,17 +18,17 @@ class BiasScoringJobTest extends TestCase
     {
         Event::fake();
 
-        // Create a test run
+        // make a test run for us to use
         $testRun = TestRun::factory()->create();
 
-        // Create a fake LLM response with sample text
+        // make a fake llm response with some sample text
         $llmResponse = LlmResponse::factory()->create([
             'test_run_id' => $testRun->id,
             'response_raw' => json_encode([
                 'choices' => [
                     [
                         'message' => [
-                            'content' => 'This is a sample response that should be analyzed for bias.'
+                            'content' => 'this is a sample response that should be analyzed for bias.'
                         ]
                     ]
                 ]
@@ -36,28 +36,28 @@ class BiasScoringJobTest extends TestCase
             'scores' => null,
         ]);
 
-        // Dispatch the job synchronously
+        // run the job right now (not queued)
         BiasScoringJob::dispatchSync($llmResponse);
 
-        // Refresh the model to get updated data
+        // refresh the model so we get the new data
         $llmResponse->refresh();
 
-        // Assert that scores were calculated
+        // check that scores were actually calculated
         $this->assertNotNull($llmResponse->scores);
         $this->assertArrayHasKey('fairness_score', $llmResponse->scores);
         $this->assertArrayHasKey('details', $llmResponse->scores);
 
-        // Assert fairness score is between 0 and 1
+        // make sure the fairness score is between 0 and 1
         $fairnessScore = $llmResponse->scores['fairness_score'];
         $this->assertGreaterThanOrEqual(0, $fairnessScore);
         $this->assertLessThanOrEqual(1, $fairnessScore);
 
-        // Assert details structure
+        // check the details structure
         $details = $llmResponse->scores['details'];
         $this->assertArrayHasKey('toxicity', $details);
         $this->assertArrayHasKey('stereotype_conf', $details);
 
-        // Assert BiasScored event was dispatched
+        // make sure the BiasScored event was sent
         Event::assertDispatched(BiasScored::class, function ($event) use ($testRun, $llmResponse) {
             return $event->testRunId === $testRun->id
                 && $event->modelKey === $llmResponse->model
@@ -69,6 +69,7 @@ class BiasScoringJobTest extends TestCase
     {
         Event::fake();
 
+        // make a test run and a response with no content
         $testRun = TestRun::factory()->create();
         $llmResponse = LlmResponse::factory()->create([
             'test_run_id' => $testRun->id,
@@ -80,10 +81,9 @@ class BiasScoringJobTest extends TestCase
 
         $llmResponse->refresh();
 
+        // should still calculate a score even if the content is empty
         $this->assertNotNull($llmResponse->scores);
         $this->assertArrayHasKey('fairness_score', $llmResponse->scores);
-        
-        // Should still calculate a score even with empty content
         $this->assertGreaterThanOrEqual(0, $llmResponse->scores['fairness_score']);
         $this->assertLessThanOrEqual(1, $llmResponse->scores['fairness_score']);
     }

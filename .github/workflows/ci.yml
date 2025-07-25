@@ -1,4 +1,5 @@
-name: CI
+# this is our github actions workflow for ci, using docker compose for everything
+name: ci
 
 on:
   push:
@@ -9,36 +10,36 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: laravel
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Docker Compose
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: set up docker compose
         run: docker compose up -d --build
-      - name: Wait for MySQL
+
+      # wait for mysql to be healthy (no port published to host)
+      - name: wait for mysql
         run: |
-          until docker exec laravel-mysql mysqladmin ping -h"localhost" --silent; do
+          until docker exec laravel-mysql mysqladmin ping -h"localhost" -uroot -p"${{ secrets.DB_PASSWORD || 'root' }}" --silent; do
             sleep 2
           done
-      - name: Run migrations
+
+      - name: run migrations
         run: docker exec laravel-app php artisan migrate --force
-      - name: PHP Lint
+
+      - name: php lint
         run: docker exec laravel-app find . -type f -name '*.php' -exec php -l {} \;
-      - name: Run PHPCS
+
+      - name: run phpcs
         run: docker exec laravel-app vendor/bin/phpcs --standard=PSR12 app/ || true
-      - name: Run PHPUnit
+
+      - name: run phpunit
         run: docker exec laravel-app php artisan test --coverage --min=70
-      - name: Security Scan
+
+      - name: security scan
         run: |
           docker exec laravel-app composer require --dev enlightn/security-checker
           docker exec laravel-app vendor/bin/security-checker security:check
-      - name: Tear down
-        run: docker-compose down 
+
+      - name: tear down
+        run: docker compose down --remove-orphans 

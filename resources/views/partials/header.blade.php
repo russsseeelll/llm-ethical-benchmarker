@@ -1,4 +1,4 @@
-{{-- header.blade.php --}}
+{{-- this is our site header, shows the title and a little description --}}
 <header class="text-center py-4 bg-primary text-white shadow">
     <a href="/" class="text-white text-decoration-none">
         <h1 class="display-5 fw-bold">LLM Ethical Benchmark</h1>

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Persona extends Model
 {
     /** @use HasFactory<\Database\Factories\PersonaFactory> */
+    // this lets us use the factory for this model
     use HasFactory;
 
     protected $fillable = [
@@ -19,6 +20,7 @@ class Persona extends Model
 
     public function scenarios()
     {
+        // this gets all scenarios for this persona
         return $this->hasMany(Scenario::class);
     }
 
@@ -26,8 +28,9 @@ class Persona extends Model
     {
         parent::boot();
         static::deleting(function ($persona) {
+            // don't let us delete if there are scenarios for this persona
             if ($persona->scenarios()->count() > 0) {
-                throw new \Exception('Cannot delete persona with attributed scenarios.');
+                throw new \Exception('cannot delete persona with attributed scenarios.');
             }
         });
     }

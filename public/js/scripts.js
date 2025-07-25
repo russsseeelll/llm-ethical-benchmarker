@@ -1,3 +1,4 @@
+// this file has our custom js for modals, dropdowns, and multiple choice stuff
 
 function openModal() {
     document.getElementById('createScenarioModal').classList.remove('hidden');
@@ -9,7 +10,7 @@ function closeModal() {
 
 function saveScenario() {
     closeModal();
-    alert('Scenario saved!');
+    alert('scenario saved!');
 }
 
 function toggleDropdown(event, icon) {
@@ -19,6 +20,7 @@ function toggleDropdown(event, icon) {
 }
 
 document.addEventListener('click', function(event) {
+    // close all dropdowns if us click outside
     if (!event.target.closest('.dropdown')) {
         const dropdowns = document.querySelectorAll('.dropdown-content');
         dropdowns.forEach(dropdown => {
@@ -37,6 +39,7 @@ function toggleMultipleChoice(isChecked) {
 }
 
 function addChoiceField() {
+    // add a new choice field for multiple choice questions
     const choiceFieldContainer = document.createElement('div');
     choiceFieldContainer.classList.add('choice-field', 'mb-2');
     choiceFieldContainer.innerHTML = `
@@ -57,6 +60,7 @@ function removeChoiceField(button) {
 }
 
 function generateResponse(modelId, button) {
+    // fake showing a response and bias section for demo
     document.getElementById(`${modelId}-response`).classList.remove('hidden');
     button.classList.add('bg-gray-400', 'cursor-not-allowed');
     button.classList.remove('bg-green-500', 'hover:bg-green-600');

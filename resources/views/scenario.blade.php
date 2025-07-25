@@ -1,13 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<!-- this is the scenario page where us can run models and see results -->
 <div class="container py-4"
      id="scenario-root"
      data-scenario="{{ $scenario->id }}"
      data-persona="{{ $scenario->persona->id ?? '' }}"
      data-csrf="{{ csrf_token() }}">
 
-    {{-- ────────── Scenario Header ────────── --}}
+    {{-- ---------- Scenario Header ---------- --}}
     <div class="card shadow-sm mb-4 position-relative">
         <div class="card-body">
             <h2 class="h3 fw-bold text-primary mb-3">Scenario: {{ $scenario->title }}</h2>
@@ -18,7 +19,7 @@
         </div>
     </div>
 
-    {{-- ────────── Persona Banner ────────── --}}
+    {{-- ---------- Persona Banner ---------- --}}
     @if($scenario->persona)
         <div class="alert alert-secondary mb-4">
             <strong>Persona:</strong> {{ $scenario->persona->name }} —
@@ -26,18 +27,18 @@
         </div>
     @endif
 
-    {{-- ────────── Real Life Outcome ────────── --}}
+    {{-- ---------- Real Life Outcome ---------- --}}
     @if(!empty($scenario->real_life_outcome))
         <div class="alert alert-success mb-4">
             <strong>Real Life Outcome:</strong> {{ $scenario->real_life_outcome }}
         </div>
     @endif
 
-    {{-- ────────── LLM Cards ────────── --}}
+    {{-- ---------- LLM Cards ---------- --}}
     <div class="row g-4">
         @php
             $cards = [
-                ['key' => 'openai_gpt4o',  'label' => 'ChatGPT (GPT‑4o)',      'id' => 'card1'],
+                ['key' => 'openai_gpt4o',  'label' => 'ChatGPT (GPT–4o)',      'id' => 'card1'],
                 ['key' => 'claude_sonnet', 'label' => 'Claude 3 Sonnet',       'id' => 'card2'],
                 ['key' => 'deepseek_fp8',  'label' => 'DeepSeek FP8',          'id' => 'card3'],
             ];
@@ -119,6 +120,7 @@
 </div>
 
 {{-- Raw Response Modal --}}
+<!-- this modal shows the raw llm response -->
 <div class="modal fade" id="rawModal" tabindex="-1" aria-labelledby="rawModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -137,6 +139,7 @@
 </div>
 
 {{-- Fairness Details Modal --}}
+<!-- this modal shows the fairness and bias details -->
 <div class="modal fade" id="biasDetailsModal" tabindex="-1" aria-labelledby="biasDetailsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

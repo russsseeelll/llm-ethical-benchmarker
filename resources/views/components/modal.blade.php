@@ -1,3 +1,4 @@
+<!-- this is our generic modal component, us use it for all kinds of popups -->
 <div class="modal fade" id="{{ $id }}" tabindex="-1" aria-labelledby="{{ $id }}Label" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

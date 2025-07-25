@@ -1,3 +1,4 @@
+<!-- this is the main layout for all pages -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +11,7 @@
 <body class="d-flex flex-column min-vh-100 bg-light">
     @include('partials.header')
     <main class="flex-fill">
+        <!-- show success or error messages if we have them -->
         @if (session('success'))
             <div class="container pt-3">
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -29,6 +31,7 @@
         @yield('content')
     </main>
     @include('partials.footer')
+    <!-- load bootstrap and any extra scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
     @stack('scripts')
 </body>

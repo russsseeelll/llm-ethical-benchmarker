@@ -35,7 +35,7 @@ class RunPromptJob implements ShouldQueue
             'temperature' => $this->temperature,
         ]);
 
-        // Build composite prompt from scenario + persona snapshots
+        // build the prompt using the scenario and persona
         $prompt = PromptBuilder::fromTestRun($this->testRun);
 
         try {
@@ -53,7 +53,7 @@ class RunPromptJob implements ShouldQueue
             return;
         }
 
-        // Persist response
+        // save the response
         $llmResponse = $this->testRun->llmResponses()->create([
             'provider'     => 'openrouter',
             'model'        => config("models.{$this->modelKey}"),
@@ -65,7 +65,7 @@ class RunPromptJob implements ShouldQueue
             'scores'       => null,
         ]);
 
-        // Broadcast raw answer back to UI
+        // send the answer to the ui
         event(new LlmResponseCreated(
             testRunId: $this->testRun->id,
             modelKey:  $this->modelKey,
@@ -73,10 +73,10 @@ class RunPromptJob implements ShouldQueue
             latencyMs: $result['latency_ms'],
         ));
 
-        // Dispatch bias scoring job
+        // start bias scoring
         BiasScoringJob::dispatch($llmResponse)->onQueue('scoring');
 
-        // Mark test‑run completed for this individual response
+        // mark the test run as done
         $this->testRun->update([
             'status'       => 'completed',
             'completed_at' => now(),

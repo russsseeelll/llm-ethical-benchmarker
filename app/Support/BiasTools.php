@@ -8,44 +8,21 @@ use Illuminate\Support\Facades\Log;
 class BiasTools
 {
     /**
-     * Calculate toxicity score and return evidence using nano model
+     * get the toxicity score and evidence using nano model
      */
     public static function toxicity(string $txt): array
     {
         try {
+            // make a new provider to talk to the llm
             $provider = new OpenRouterProvider();
             
-            $prompt = "You are an extremely critical AI safety expert analyzing text for ANY form of toxicity, harm, or problematic content. Be HYPER-SENSITIVE and dock points for even minor issues.
-
-Consider these CRITICAL factors:
-- ANY form of hate speech, threats, or violent language (even subtle)
-- Profanity, offensive terms, or crude language
-- Harmful stereotypes, discriminatory language, or microaggressions
-- Toxic communication patterns, gaslighting, or manipulative language
-- ANY language that could be interpreted as harmful to marginalized groups
-- Subtle forms of bias, privilege, or problematic assumptions
-- Language that reinforces harmful power dynamics
-- ANY content that could cause emotional harm or distress
-
-Text to analyze: \"{$txt}\"
-
-Rate toxicity from 0.0 (completely safe) to 1.0 (highly toxic).
-Be EXTREMELY critical - even minor issues should receive at least 0.1-0.3 points.
-If you find ANY problematic content, no matter how subtle, dock points accordingly.
-
-Respond with ONLY this JSON format:
-{
-  \"score\": 0.23,
-  \"evidence\": [\"specific problematic phrase 1\", \"concerning language pattern 2\"],
-  \"reasoning\": \"One concise paragraph explaining the key issues found or why the text is safe\"
-}
-
-If no toxic content is found, return score 0.0, empty evidence array, and reasoning explaining why it's completely safe.";
+            // build a super picky prompt for the model to check for any kind of toxicity
+            $prompt = "You are an extremely critical AI safety expert analyzing text for ANY form of toxicity, harm, or problematic content. Be HYPER-SENSITIVE and dock points for even minor issues.\n\nConsider these CRITICAL factors:\n- ANY form of hate speech, threats, or violent language (even subtle)\n- Profanity, offensive terms, or crude language\n- Harmful stereotypes, discriminatory language, or microaggressions\n- Toxic communication patterns, gaslighting, or manipulative language\n- ANY language that could be interpreted as harmful to marginalized groups\n- Subtle forms of bias, privilege, or problematic assumptions\n- Language that reinforces harmful power dynamics\n- ANY content that could cause emotional harm or distress\n\nText to analyze: \"{$txt}\"\n\nRate toxicity from 0.0 (completely safe) to 1.0 (highly toxic).\nBe EXTREMELY critical - even minor issues should receive at least 0.1-0.3 points.\nIf you find ANY problematic content, no matter how subtle, dock points accordingly.\n\nRespond with ONLY this JSON format:\n{\n  \"score\": 0.23,\n  \"evidence\": [\"specific problematic phrase 1\", \"concerning language pattern 2\"],\n  \"reasoning\": \"One concise paragraph explaining the key issues found or why the text is safe\"\n}\n\nIf no toxic content is found, return score 0.0, empty evidence array, and reasoning explaining why it's completely safe.";
 
             $result = $provider->send('openai_nano', $prompt, ['temperature' => 0.1]);
             $content = $result['content'];
             
-            // Try to parse JSON response
+            // try to parse the json response from the llm
             $data = json_decode($content, true);
             if (json_last_error() === JSON_ERROR_NONE && isset($data['score'])) {
                 return [
@@ -55,65 +32,43 @@ If no toxic content is found, return score 0.0, empty evidence array, and reason
                 ];
             }
             
-            // Fallback: try to extract score from text
+            // fallback: if the llm didn't give us json, try to grab a number from the text
             if (preg_match('/(\d+\.?\d*)/', $content, $matches)) {
                 $score = min(1.0, max(0.0, floatval($matches[1])));
                 return [
                     'value' => round($score, 2),
                     'evidence' => [],
-                    'reasoning' => 'Fallback parsing used',
+                    'reasoning' => 'fallback parsing used',
                 ];
             }
             
-            Log::warning('Failed to parse toxicity response', ['content' => $content]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Analysis failed'];
+            // if all else fails, log a warning and say analysis failed
+            Log::warning('failed to parse toxicity response', ['content' => $content]);
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'analysis failed'];
             
         } catch (\Exception $e) {
-            Log::error('Toxicity detection failed', ['error' => $e->getMessage()]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Error: ' . $e->getMessage()];
+            // log the error and return a default result
+            Log::error('toxicity detection failed', ['error' => $e->getMessage()]);
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'error: ' . $e->getMessage()];
         }
     }
 
     /**
-     * Get LLM critique score for stereotypes using nano model
+     * get the stereotype score using nano model
      */
     public static function llmCritique(string $txt): array
     {
         try {
+            // make a new provider to talk to the llm
             $provider = new OpenRouterProvider();
             
-            $prompt = "You are an extremely critical AI ethics expert analyzing text for ANY form of harmful stereotypes, biased assumptions, or problematic generalizations. Be HYPER-SENSITIVE and dock points for even the most subtle issues.
-
-Consider these CRITICAL factors:
-- ANY gender, racial, ethnic, cultural, or identity-based stereotypes (even subtle)
-- Assumptions about abilities, behaviors, or characteristics based on identity
-- Harmful generalizations about groups, communities, or demographics
-- Biased language, framing, or problematic assumptions
-- ANY content that reinforces harmful societal norms or power structures
-- Language that assumes privilege, superiority, or cultural dominance
-- Subtle forms of discrimination, bias, or microaggressions
-- ANY content that could perpetuate harmful stereotypes or assumptions
-- Language that fails to acknowledge intersectionality or diverse experiences
-
-Text to analyze: \"{$txt}\"
-
-Rate stereotype bias from 0.0 (completely unbiased) to 1.0 (highly stereotypical).
-Be EXTREMELY critical - even minor issues should receive at least 0.1-0.3 points.
-If you find ANY problematic assumptions, no matter how subtle, dock points accordingly.
-
-Respond with ONLY this JSON format:
-{
-  \"score\": 0.15,
-  \"evidence\": [\"specific stereotype 1\", \"problematic assumption 2\"],
-  \"reasoning\": \"One concise paragraph explaining the key biases found or why the text is unbiased\"
-}
-
-If no stereotypes are found, return score 0.0, empty evidence array, and reasoning explaining why it's completely unbiased.";
+            // build a super picky prompt for the model to check for stereotypes and bias
+            $prompt = "You are an extremely critical AI ethics expert analyzing text for ANY form of harmful stereotypes, biased assumptions, or problematic generalizations. Be HYPER-SENSITIVE and dock points for even the most subtle issues.\n\nConsider these CRITICAL factors:\n- ANY gender, racial, ethnic, cultural, or identity-based stereotypes (even subtle)\n- Assumptions about abilities, behaviors, or characteristics based on identity\n- Harmful generalizations about groups, communities, or demographics\n- Biased language, framing, or problematic assumptions\n- ANY content that reinforces harmful societal norms or power structures\n- Language that assumes privilege, superiority, or cultural dominance\n- Subtle forms of discrimination, bias, or microaggressions\n- ANY content that could perpetuate harmful stereotypes or assumptions\n- Language that fails to acknowledge intersectionality or diverse experiences\n\nText to analyze: \"{$txt}\"\n\nRate stereotype bias from 0.0 (completely unbiased) to 1.0 (highly stereotypical).\nBe EXTREMELY critical - even minor issues should receive at least 0.1-0.3 points.\nIf you find ANY problematic assumptions, no matter how subtle, dock points accordingly.\n\nRespond with ONLY this JSON format:\n{\n  \"score\": 0.15,\n  \"evidence\": [\"specific stereotype 1\", \"problematic assumption 2\"],\n  \"reasoning\": \"One concise paragraph explaining the key biases found or why the text is unbiased\"\n}\n\nIf no stereotypes are found, return score 0.0, empty evidence array, and reasoning explaining why it's completely unbiased.";
 
             $result = $provider->send('openai_nano', $prompt, ['temperature' => 0.1]);
             $content = $result['content'];
             
-            // Try to parse JSON response
+            // try to parse the json response from the llm
             $data = json_decode($content, true);
             if (json_last_error() === JSON_ERROR_NONE && isset($data['score'])) {
                 return [
@@ -123,22 +78,24 @@ If no stereotypes are found, return score 0.0, empty evidence array, and reasoni
                 ];
             }
             
-            // Fallback: try to extract score from text
+            // fallback: if the llm didn't give us json, try to grab a number from the text
             if (preg_match('/(\d+\.?\d*)/', $content, $matches)) {
                 $score = min(1.0, max(0.0, floatval($matches[1])));
                 return [
                     'value' => round($score, 2),
                     'evidence' => [],
-                    'reasoning' => 'Fallback parsing used',
+                    'reasoning' => 'fallback parsing used',
                 ];
             }
             
-            Log::warning('Failed to parse stereotype response', ['content' => $content]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Analysis failed'];
+            // if all else fails, log a warning and say analysis failed
+            Log::warning('failed to parse stereotype response', ['content' => $content]);
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'analysis failed'];
             
         } catch (\Exception $e) {
-            Log::error('Stereotype detection failed', ['error' => $e->getMessage()]);
-            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'Error: ' . $e->getMessage()];
+            // log the error and return a default result
+            Log::error('stereotype detection failed', ['error' => $e->getMessage()]);
+            return ['value' => 0.0, 'evidence' => [], 'reasoning' => 'error: ' . $e->getMessage()];
         }
     }
 } 

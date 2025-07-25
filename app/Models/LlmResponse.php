@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class LlmResponse extends Model
 {
     /** @use HasFactory<\Database\Factories\LlmResponseFactory> */
+    // this lets us use the factory for this model
     use HasFactory;
 
     protected $guarded = [];
@@ -25,26 +26,28 @@ class LlmResponse extends Model
     ];
 
     protected $casts = [
-        'scores' => 'array',
+        'scores' => 'array', // we store scores as an array
     ];
 
     /**
-     * Extract clean text content from response_raw JSON
+     * get the text from the response_raw json
      */
     public function parsed_content(): string
     {
+        // try to decode the raw response as json
         $raw = json_decode($this->response_raw, true);
         
+        // if it's an array and has the content, return it
         if (is_array($raw) && isset($raw['choices'][0]['message']['content'])) {
             return $raw['choices'][0]['message']['content'];
         }
         
-        // Fallback: if it's already a string, return as is
+        // fallback: if it's already a string, return as is
         if (is_string($raw)) {
             return $raw;
         }
         
-        // Last resort: return empty string
+        // last resort: return empty string
         return '';
     }
 }
