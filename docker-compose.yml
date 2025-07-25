@@ -1,3 +1,4 @@
+# this docker compose file is for running the app with sqlite only (no mysql)
 version: '3.8'
 services:
   app:

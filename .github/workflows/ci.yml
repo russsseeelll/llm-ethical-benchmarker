@@ -17,11 +17,23 @@ jobs:
       - name: set up docker compose
         run: docker compose up -d --build
 
+      # always install composer dependencies inside the container (volume mount overwrites vendor)
+      - name: install composer dependencies
+        run: docker exec laravel-app composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      # always create the sqlite database file (safe if it already exists)
       - name: create sqlite database file
         run: docker exec laravel-app touch /var/www/database/database.sqlite
 
+      # run migrations, and if it fails, show the database directory for debugging
       - name: run migrations
-        run: docker exec laravel-app php artisan migrate --force
+        run: |
+          set -e
+          if ! docker exec laravel-app php artisan migrate --force; then
+            echo "migrations failed, showing database directory contents:"
+            docker exec laravel-app ls -l /var/www/database
+            exit 1
+          fi
 
       - name: php lint
         run: docker exec laravel-app find . -type f -name '*.php' -exec php -l {} \;
