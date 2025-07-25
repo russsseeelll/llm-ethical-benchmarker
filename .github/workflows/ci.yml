@@ -1,4 +1,4 @@
-# this is our github actions workflow for ci, using docker compose for everything
+# this is our github actions workflow for ci, using docker compose and sqlite
 name: ci
 
 on:
@@ -17,12 +17,8 @@ jobs:
       - name: set up docker compose
         run: docker compose up -d --build
 
-      # wait for mysql to be healthy (no port published to host)
-      - name: wait for mysql
-        run: |
-          until docker exec laravel-mysql mysqladmin ping -h"localhost" -uroot -p"${{ secrets.DB_PASSWORD || 'root' }}" --silent; do
-            sleep 2
-          done
+      - name: create sqlite database file
+        run: docker exec laravel-app touch /var/www/database/database.sqlite
 
       - name: run migrations
         run: docker exec laravel-app php artisan migrate --force
