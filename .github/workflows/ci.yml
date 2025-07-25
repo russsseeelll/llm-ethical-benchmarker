@@ -35,11 +35,12 @@ jobs:
             exit 1
           fi
 
+      # lint all our php code, including resources/ and public/
       - name: php lint
-        run: docker exec laravel-app find . -type f -name '*.php' -exec php -l {} \;
+        run: |
+          docker exec laravel-app find app routes database tests resources public -type f -name '*.php' -exec php -l {} \;
 
-      - name: run phpcs
-        run: docker exec laravel-app vendor/bin/phpcs --standard=PSR12 app/ || true
+      # phpcs is skipped because vendor/bin/phpcs is not present in this project
 
       - name: run phpunit
         run: docker exec laravel-app php artisan test --coverage --min=70
