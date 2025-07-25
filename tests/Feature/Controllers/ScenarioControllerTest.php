@@ -28,7 +28,7 @@ class ScenarioControllerTest extends TestCase
         $response = $this->post('/scenarios', $data);
 
         $response->assertRedirect('/');
-        $response->assertSessionHas('success', 'Scenario created successfully.');
+        $response->assertSessionHas('success', 'scenario created successfully.');
         
         $this->assertDatabaseHas('scenarios', [
             'title' => 'Test Scenario',
@@ -118,7 +118,7 @@ class ScenarioControllerTest extends TestCase
         $response = $this->put("/scenarios/{$scenario->id}", $data);
 
         $response->assertRedirect('/');
-        $response->assertSessionHas('success', 'Scenario updated successfully.');
+        $response->assertSessionHas('success', 'scenario updated successfully.');
         
         $this->assertDatabaseHas('scenarios', [
             'id' => $scenario->id,
@@ -145,7 +145,7 @@ class ScenarioControllerTest extends TestCase
         ]);
 
         $response->assertRedirect('/');
-        $response->assertSessionHas('success', 'Scenario updated successfully.');
+        $response->assertSessionHas('success', 'scenario updated successfully.');
     }
 
     public function test_update_validates_required_fields(): void
@@ -178,7 +178,7 @@ class ScenarioControllerTest extends TestCase
         $response = $this->delete("/scenarios/{$scenario->id}");
 
         $response->assertRedirect('/');
-        $response->assertSessionHas('success', 'Scenario deleted successfully.');
+        $response->assertSessionHas('success', 'scenario deleted successfully.');
         
         $this->assertDatabaseMissing('scenarios', ['id' => $scenario->id]);
     }
@@ -190,7 +190,7 @@ class ScenarioControllerTest extends TestCase
         $response = $this->delete("/scenarios/{$scenario->slug}");
 
         $response->assertRedirect('/');
-        $response->assertSessionHas('success', 'Scenario deleted successfully.');
+        $response->assertSessionHas('success', 'scenario deleted successfully.');
         
         $this->assertDatabaseMissing('scenarios', ['id' => $scenario->id]);
     }

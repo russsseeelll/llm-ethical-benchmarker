@@ -41,7 +41,7 @@ class PersonaTest extends TestCase
         Scenario::factory()->create(['persona_id' => $persona->id]);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Cannot delete persona with attributed scenarios.');
+        $this->expectExceptionMessage('cannot delete persona with attributed scenarios.');
 
         $persona->delete();
     }

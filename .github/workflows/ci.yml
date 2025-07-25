@@ -21,6 +21,12 @@ jobs:
       - name: install composer dependencies
         run: docker exec laravel-app composer install --no-interaction --prefer-dist --optimize-autoloader
 
+      # copy .env.example to .env and generate app key (fixes missing app key and .env errors)
+      - name: set up .env and app key
+        run: |
+          docker exec laravel-app cp .env.example .env
+          docker exec laravel-app php artisan key:generate
+
       # always create the sqlite database file (safe if it already exists)
       - name: create sqlite database file
         run: docker exec laravel-app touch /var/www/database/database.sqlite

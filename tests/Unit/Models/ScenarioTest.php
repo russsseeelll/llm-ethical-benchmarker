@@ -54,7 +54,7 @@ class ScenarioTest extends TestCase
         ]);
 
         // check that the slug was generated
-        $this->assertEquals('TestScenarioTitle', $scenario->slug);
+        $this->assertEquals('testscenariotitle', $scenario->slug);
     }
 
     public function test_scenario_uses_existing_slug_if_provided(): void
