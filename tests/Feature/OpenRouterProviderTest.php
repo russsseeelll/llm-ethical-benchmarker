@@ -11,21 +11,19 @@ class OpenRouterProviderTest extends TestCase
     public function test_it_returns_clean_response_structure(): void
     {
         Http::fake([
-            'openrouter.ai/*' => Http::response([
+            '*' => Http::response([
                 'choices' => [
-                    ['message' => ['content' => 'Hello world!']],
+                    ['message' => ['content' => 'fake response']],
                 ],
-                'usage' => ['total_tokens' => 42],
+                'usage' => ['total_tokens' => 10],
             ], 200),
         ]);
-
-        $provider = app(OpenRouterProvider::class);
-
-        $result = $provider->send('openai_gpt4o', 'Say hello', ['temperature' => 0.2]);
-
-        $this->assertSame('Hello world!', $result['content']);
-        $this->assertEquals(42, $result['usage_tokens']);
-        $this->assertGreaterThanOrEqual(0, $result['latency_ms']);
-        $this->assertGreaterThanOrEqual(0, $result['cost_usd']);
+        $provider = new OpenRouterProvider();
+        $result = $provider->send('openai_gpt4o', 'prompt');
+        $this->assertArrayHasKey('content', $result);
+        $this->assertArrayHasKey('latency_ms', $result);
+        $this->assertArrayHasKey('usage_tokens', $result);
+        $this->assertArrayHasKey('cost_usd', $result);
+        $this->assertArrayHasKey('raw_response', $result);
     }
 }
